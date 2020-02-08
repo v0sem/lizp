@@ -2,21 +2,10 @@
 
 
 (defun newton (f df-dx max-iter x0 &optional (tol-abs 0.0001))
-  "Zero of a function using the Newton-Raphson method
-
-
-    INPUT:  f:        function whose zero we wish to find
-            df-dx:    derivative of f
-            max-iter: maximum number of iterations 
-            x0:       initial estimation of the zero (seed)
-            tol-abs:  tolerance for convergence
-
-
-    OUTPUT: estimation of the zero of f, NIL if not converged"
-    (if (or (< x0 tol-abs) (= max-iter 0))
+  (let ((xn (- x0 (/ (funcall f x0) (funcall df-dx x0)))))
+    (if (or (< (abs (- x0 xn)) tol-abs) (= max-iter 0))
       x0
-      (newton f df-dx (- max-iter 1) (- x0 (/ (funcall f x0) (funcall df-dx x0)) tol-abs)))
-  )
+      (newton f df-dx (- max-iter 1) xn tol-abs))))
 
 
 
@@ -36,6 +25,8 @@
 
 
     OUTPUT: list of estimations of the zeros of f"
+    (newton f df-dx max-iter (car seeds) tol-abs)
+    (newton-all f df-dx max-iter (cdr seeds) tol-abs)
   )
 
 
