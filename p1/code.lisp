@@ -13,6 +13,9 @@
 
 
     OUTPUT: estimation of the zero of f, NIL if not converged"
+    (if (or (< x0 tol-abs) (= max-iter 0))
+      x0
+      (newton f df-dx (- max-iter 1) (- x0 (/ (funcall f x0) (funcall df-dx x0)) tol-abs)))
   )
 
 
