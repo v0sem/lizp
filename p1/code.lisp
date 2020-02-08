@@ -8,30 +8,14 @@
       (newton f df-dx (- max-iter 1) xn tol-abs))))
 
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun newton-all (f df-dx max-iter seeds &optional (tol-abs 0.0001))
-  "Zeros of a function using the Newton-Raphson method
+  (defun assist (x0)
+    (newton f df-dx max-iter x0 tol-abs))
 
-
-    INPUT:  f:        function whose zero we wish to find
-            df-dx:    derivative of f
-            max-iter: maximum number of iterations 
-            seeds:    list of initial estimations of the zeros 
-            tol-abs:  tolerance for convergence
-
-
-    OUTPUT: list of estimations of the zeros of f"
-    (newton f df-dx max-iter (car seeds) tol-abs)
-    (newton-all f df-dx max-iter (cdr seeds) tol-abs)
-  )
-
-
-
-
+  (mapcar #'assist seeds))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
