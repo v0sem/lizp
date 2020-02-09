@@ -2,63 +2,30 @@
 
 
 (defun newton (f df-dx max-iter x0 &optional (tol-abs 0.0001))
-	"Zero of a function using the Newton-Raphson method
-
-
-		INPUT:  f:        function whose zero we wish to find
-						df-dx:    derivative of f
-						max-iter: maximum number of iterations 
-						x0:       initial estimation of the zero (seed)
-						tol-abs:  tolerance for convergence
-
-
-		OUTPUT: estimation of the zero of f, NIL if not converged"
-    (if ( = max-iter 0) nil
-        (let ((x (- x0 (/ (funcall f x0) (funcall df-dx x0)))))))
-    (if (< (abs(- x x0)) tol-abs)
-		x0
-		(newton f df-dx (- max-iter 1) x tol-abs)))
-    
-
+  (let ((xn (- x0 (/ (funcall f x0) (funcall df-dx x0)))))
+    (if (or (< (abs (- x0 xn)) tol-abs) (= max-iter 0))
+      xn
+      (newton f df-dx (- max-iter 1) xn tol-abs))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun newton-all (f df-dx max-iter seeds &optional (tol-abs 0.0001))
-	"Zeros of a function using the Newton-Raphson method
+  (defun assist (x0)
+    (newton f df-dx max-iter x0 tol-abs))
 
-
-		INPUT:  f:        function whose zero we wish to find
-						df-dx:    derivative of f
-						max-iter: maximum number of iterations 
-						seeds:    list of initial estimations of the zeros 
-						tol-abs:  tolerance for convergence
-
-
-		OUTPUT: list of estimations of the zeros of f"
-	)
-
-
-
-
+  (mapcar #'assist seeds))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun combine-elt-lst (elt lst)
-	"Combines an element with all the elements of a list
+	(mapcar #'(lambda (x) (list elt x))
+        lst))
 
 
-		INPUT:  elt: element 
-						lst: list 
-
-
-		OUTPUT: list of pairs, such that 
-							 the first element of the pair is elt. 
-							 the second element is an element from lst"
- ) 
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun combine-list-of-lsts (lolsts)
