@@ -2,10 +2,11 @@
 
 
 (defun newton (f df-dx max-iter x0 &optional (tol-abs 0.0001))
-  (let ((xn (- x0 (/ (funcall f x0) (funcall df-dx x0)))))
-    (if (or (< (abs (- x0 xn)) tol-abs) (= max-iter 0))
+  (if  (= max-iter 0) nil
+  	(let ((xn (- x0 (/ (funcall f x0) (funcall df-dx x0)))))
+    (if (or (< (abs (- x0 xn)) tol-abs))
       xn
-      (newton f df-dx (- max-iter 1) xn tol-abs))))
+      (newton f df-dx (- max-iter 1) xn tol-abs)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -14,7 +15,6 @@
 (defun newton-all (f df-dx max-iter seeds &optional (tol-abs 0.0001))
   (defun assist (x0)
     (newton f df-dx max-iter x0 tol-abs))
-
   (mapcar #'assist seeds))
 
 
