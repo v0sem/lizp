@@ -42,8 +42,8 @@
 					 sublist the first element is from list1
 								 the second element is from list 2
 								 ...
-								 the Nth element is from list N"
-	)
+								 the Nth element is from list N"	
+)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -73,6 +73,7 @@
 
 
 		OUTPUT: euclidean norm of x"
+	(sqrt (scalar-product x x))
 )
 
 
@@ -91,6 +92,7 @@ ________________
 
 
 		OUTPUT: euclidean distance between x and y"
+		(euclidean-norm (mapcar #'- x y))
 	)
 
 
