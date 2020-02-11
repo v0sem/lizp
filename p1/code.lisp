@@ -114,6 +114,9 @@ ________________
 			 * Evaluates to NIL (not defined)
 				 if at least one of the vectors has zero norm.
 			 * The two vectors are assumed to have the same length"
+		(let ((xn (euclidean-norm x)) (yn (euclidean-norm y)))
+			(if (or (= 0 xn) (= 0 yn)) nil
+				(/ (scalar-product x y) (* xn yn))))
 	)
 
 
@@ -134,7 +137,9 @@ ________________
 				if at least one of the vectors has zero norm.
 			* The two vectors are assumed to have the same length"
 
-
+		(let ((var (cosine-similarity x y)))
+			(if (null var) nil
+			(/ (acos var) pi)))
 	)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; select-vectors
