@@ -13,9 +13,8 @@
 
 
 (defun newton-all (f df-dx max-iter seeds &optional (tol-abs 0.0001))
-  (defun assist (x0)
-    (newton f df-dx max-iter x0 tol-abs))
-  (mapcar #'assist seeds))
+  (mapcar #'(lambda (x0)
+    (newton f df-dx max-iter x0 tol-abs)) seeds))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -25,8 +24,12 @@
 	(mapcar #'(lambda (x) (list elt x))
         lst))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-	
+(defun combine-lst-lst (lst1 lst2)
+  	(reduce #'append (mapcar #'(lambda(elt) (combine-elt-lst elt lst2)) lst1)))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun combine-list-of-lsts (lolsts)
 	"Combinations of N elements, each of wich
@@ -40,7 +43,6 @@
 								 the second element is from list 2
 								 ...
 								 the Nth element is from list N"
-	
 	)
 
 
