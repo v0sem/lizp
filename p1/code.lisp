@@ -35,14 +35,29 @@
 	"Combinations of N elements, each of wich
 
 
-	 INPUT:  lstolsts: list of N sublists (list1 ... listN)
+	INPUT:  lstolsts: list of N sublists (list1 ... listN)
 
 
-	 OUTPUT: list of sublists of N elements, such that in each 
-					 sublist the first element is from list1
-								 the second element is from list 2
-								 ...
-								 the Nth element is from list N"	
+	OUTPUT: list of sublists of N elements, such that in each 
+					sublist the first element is from list1
+								the second element is from list 2
+								...
+								the Nth element is from list N"
+	(if (null lolsts)
+		nil
+		(if (null (rest lolsts))
+			(mapcar #'list (first lolsts))
+			(let ((n1 (combine-list-of-lsts (rest lolsts))))
+				(apply #'append 
+					(mapcar #'(lambda(lst) 
+							(mapcar #'(lambda(x) (cons x lst)) (first lolsts))
+						) 
+						n1
+					)
+				)
+			)
+		)
+	)
 )
 
 
