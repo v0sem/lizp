@@ -159,6 +159,14 @@ ________________
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; select-vectors
 
+(defun similarity-cons (vector1 vector2)
+    (cons vector1 (cosine-similarity vector1 vector2)))
+
+(defun sim-map (lst-vectors vector)
+    (if (null lst-vectors)
+        ()
+        (cons
+            (cons (first lst-vectors) (cosine-similarity (first lst-vectors) vector))
 
 (defun select-vectors (lst-vectors test-vector similarity-fn &optional (threshold 0))
 		"Selects from a list the vectors whose similarity to a 
@@ -179,7 +187,13 @@ ________________
 		 
 		 NOTES: 
 				* Uses remove-if and sort"
-	
+	(defun check (x)
+		(< (rest x) threshold))
+
+	(defun sort-fn (x y)
+		(> (rest x) (rest y)))
+
+	(sort (remove-if #'check (sim-map lst-vectors test-vector)) #'sort-fn)
 	)
 
 
