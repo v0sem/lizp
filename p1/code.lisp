@@ -159,42 +159,23 @@ ________________
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; select-vectors
 
-(defun similarity-cons (vector1 vector2)
-    (cons vector1 (cosine-similarity vector1 vector2)))
-
-(defun sim-map (lst-vectors vector)
+(defun sim-map (lst-vectors vector fun)
     (if (null lst-vectors)
         ()
         (cons
-            (cons (first lst-vectors) (cosine-similarity (first lst-vectors) vector))
+            (cons (first lst-vectors) (funcall fun (first lst-vectors) vector))
+            (sim-map (rest lst-vectors) vector fun)
+		)
+	)
+)
+
 
 (defun select-vectors (lst-vectors test-vector similarity-fn &optional (threshold 0))
-		"Selects from a list the vectors whose similarity to a 
-		 test vector is above a specified threshold. 
-		 The resulting list is ordered according to this similarity.
- 
-		 INPUT:  lst-vectors:   list of vectors
-						 test-vector:   test vector, representad as a list
-						 similarity-fn: reference to a similarity function
-						 threshold:     similarity threshold (default 0)
-			
-		 OUTPUT: list of pairs. Each pair is a list with
-						 a vector and a similarity score.
-						 The vectors are such that their similarity to the 
-						 test vector is above the specified threshold.
-						 The list is ordered from larger to smaller 
-						 values of the similarity score 
-		 
-		 NOTES: 
-				* Uses remove-if and sort"
-	(defun check (x)
-		(< (rest x) threshold))
-
-	(defun sort-fn (x y)
-		(> (rest x) (rest y)))
-
-	(sort (remove-if #'check (sim-map lst-vectors test-vector)) #'sort-fn)
+    (sort 
+		(remove-if #'(lambda(x) (< (rest x) threshold))  (sim-map lst-vectors test-vector similarity-fn)) 
+		#'(lambda(x y) (> (rest x) (rest y)))
 	)
+)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -225,7 +206,7 @@ ________________
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+(defun backward-chaining-aux goal lst-rules pending-goals)
 
 (defun backward-chaining (goal lst-rules)
 	"Backward-chaining algorithm for propositional logic
@@ -242,6 +223,7 @@ ________________
 
 	 NOTES: 
 				* Implemented with some, every" 
+
 
 
 	(backward-chaining-aux goal lst-rules NIL))
