@@ -206,7 +206,32 @@ ________________
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun backward-chaining-aux goal lst-rules pending-goals)
+(defun backward-chaining-aux (goal lst-rules pending-goals)
+	(if (not (null (member goal pending-goals)))
+		NIL
+		(if (some #'(lambda(x) (and (equal (nth 1 x) goal) (null (first x)))) 
+				lst-rules
+			)
+			T
+			(let ((rules (remove-if #'(lambda(x) (not (equal (nth 1 x) goal))) lst-rules)))
+				(if (null rules)
+					NIL
+					(if (some
+							#'(lambda(rule) (equal T (every #'(lambda(x) 
+								(equal (backward-chaining-aux x (remove-if #'(lambda(x) (equal x rule)) lst-rules) (append pending-goals (list goal))) 'T)) 
+								(first rule)
+							)))
+							rules
+						)
+						T
+						NIL
+					)
+				)
+			)
+		)
+	)
+)
+
 
 (defun backward-chaining (goal lst-rules)
 	"Backward-chaining algorithm for propositional logic
@@ -223,7 +248,6 @@ ________________
 
 	 NOTES: 
 				* Implemented with some, every" 
-
 
 
 	(backward-chaining-aux goal lst-rules NIL))
