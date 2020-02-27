@@ -150,3 +150,28 @@
 (assert (equal 
 	(nearest-neighbor '((-1 -1 -1) (-2 2 2) (-1 -1 1)) '(1 1 1) #'angular-distance)
 	(cons '(-2 2 2) 0.39182654)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun backward-chaining-aux (goal lst-rules pending-goals)
+	(if (not (null (member goal pending-goals)))
+		NIL
+		(if (some #'(lambda(x) (and (equal (nth 1 x) goal) (null (first x)))) 
+				lst-rules
+			)
+			T
+			(let ((rules (remove-if #'(lambda(x) (not (equal (nth 1 x) goal))) lst-rules)))
+				(if (null rules)
+					NIL
+					(if (some
+							#'(lambda(rule) (equal T (every #'(lambda(x) 
+								(equal (backward-chaining-aux x (remove-if #'(lambda(x) (equal x rule)) lst-rules) (append pending-goals (list goal))) 'T)) 
+								(first rule)
+							)))
+							rules
+						)
+						T
+						NIL))))))
+
+
+(defun backward-chaining (goal lst-rules)
+	(backward-chaining-aux goal lst-rules NIL))
