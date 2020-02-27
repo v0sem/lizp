@@ -91,10 +91,6 @@
 	(sqrt (scalar-product x x))
 )
 
-
-________________
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; euclidean-distance
 
@@ -172,7 +168,7 @@ ________________
 
 (defun select-vectors (lst-vectors test-vector similarity-fn &optional (threshold 0))
     (sort 
-		(remove-if #'(lambda(x) (< (rest x) threshold))  (sim-map lst-vectors test-vector similarity-fn)) 
+		(remove-if #'(lambda(x) (< (rest x) threshold)) (sim-map lst-vectors test-vector similarity-fn)) 
 		#'(lambda(x y) (> (rest x) (rest y)))
 	)
 )
@@ -180,29 +176,26 @@ ________________
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun lowest-aux (map-lst-vector lowest)
+    (if (null map-lst-vector)
+        lowest
+        (let (
+            (last-lowest (cdr lowest))
+            (new-lowest (cdr (first map-lst-vector)))
+            (new-lowest-cmp (first map-lst-vector)))
+            (if (< last-lowest new-lowest)
+                (lowest-aux (rest map-lst-vector) lowest)
+                (lowest-aux (rest map-lst-vector) new-lowest-cmp))
+        )
+    )
+)
 
-________________
+(defun get-lowest (map-lst-vector)
+    (lowest-aux map-lst-vector (cons '(0 0 0) 2.0)))
 
 
 (defun nearest-neighbor (lst-vectors test-vector distance-fn)
-	"Selects from a list the vector that is closest to the 
-	 reference vector according to the specified distance function 
- 
-	 INPUT:  lst-vectors:   list of vectors
-					 ref-vector:    reference vector, represented as a list
-					 distance-fn:   reference to a distance function
-			
-	 OUTPUT: List formed by two elements:
-					 (1) the vector that is closest to the reference vector 
-							 according to the specified distance function
-					 (2) The corresponding distance value.
-
-
-	 NOTES: 
-			* The implementation is recursive
-			* It ignores the vectors in lst-vectors for which the 
-				distance value cannot be computed."
-	)
+    (get-lowest (sim-map lst-vectors test-vector distance-fn)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -251,54 +244,3 @@ ________________
 
 
 	(backward-chaining-aux goal lst-rules NIL))
-
-
-
-
-
-
-
-
-
-
-________________
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Breadth-first-search in graphs
-;;;
-(defun bfs (end queue net)
-	(if (null queue) 
-			NIL
-		(let* ((path (first queue))
-					 (node (first path)))
-			(if (eql node end) 
-					(reverse path)
-				(bfs end 
-						 (append (rest queue) 
-										 (new-paths path node net)) 
-						 net))))) 
-
-
- (defun new-paths (path node net)
-	(mapcar #'(lambda(n) 
-				(cons n path)) 
-								(rest (assoc node net))))
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-(defun shortest-path (start end net)
-	(bfs end (list (list start)) net))    
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 
-(defun bfs-improved (end queue net)
-	)
-
-
-
-
-(defun shortest-path-improved (end queue net)
-	)
