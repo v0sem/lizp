@@ -8,6 +8,9 @@
       xn
       (newton f df-dx (- max-iter 1) xn tol-abs)))))
 
+(assert (= (newton #'sin #'cos 50 1.0) 0.0))
+(assert (= (newton #'sin #'cos 50 2.0) 3.1415927))
+(assert (= (newton #'sin #'cos 50 3.0) 3.1415927))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -16,6 +19,10 @@
   (mapcar #'(lambda (x0)
     (newton f df-dx max-iter x0 tol-abs)) seeds))
 
+(assert
+	(equal
+		(newton-all #'sin #'cos 50 (mapcar #'eval '(1.0 2.0 4.0 6.0)))
+		'(0.0 3.1415927 3.1415927 6.2831855)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -24,25 +31,24 @@
 	(mapcar #'(lambda (x) (list elt x))
         lst))
 
+(assert
+	(equal
+		(combine-elt-lst 'a '(1 2 3))
+		'((A 1) (A 2) (A 3))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun combine-lst-lst (lst1 lst2)
   	(reduce #'append (mapcar #'(lambda(elt) (combine-elt-lst elt lst2)) lst1)))
 
+(assert
+	(equal
+		(combine-lst-lst '(a b c) '(1 2))
+		'((A 1) (A 2) (B 1) (B 2) (C 1) (C 2))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defun combine-list-of-lsts (lolsts)
-	"Combinations of N elements, each of wich
-
-
-	INPUT:  lstolsts: list of N sublists (list1 ... listN)
-
-
-	OUTPUT: list of sublists of N elements, such that in each 
-					sublist the first element is from list1
-								the second element is from list 2
-								...
-								the Nth element is from list N"
 	(if (null lolsts)
 		nil
 		(if (null (rest lolsts))
@@ -52,106 +58,61 @@
 					(mapcar #'(lambda(lst) 
 							(mapcar #'(lambda(x) (cons x lst)) (first lolsts))
 						) 
-						n1
-					)
-				)
-			)
-		)
-	)
-)
-
+						n1))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun scalar-product (x y)
-	"Calculates the scalar product of two vectors
- 
-	 INPUT:  x: vector, represented as a list
-					 y: vector, represented as a list
- 
-	 OUTPUT: scalar product between x and y
+		(reduce #'+ (mapcar #'* x y)))
 
-
-	 NOTES: 
-				* Implemented with mapcar"
-		(reduce #'+ (mapcar #'* x y))
-	)
-
+(assert (=
+	(scalar-product'(1 2 3) '(3 -1 5))
+	16))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; euclidean-norm
 
 
 (defun euclidean-norm (x)
-	"Calculates the euclidean (l2) norm of a vector
-	 
-		INPUT:  x: vector, represented as a list
+	(sqrt (scalar-product x x)))
 
-
-		OUTPUT: euclidean norm of x"
-	(sqrt (scalar-product x x))
-)
+(assert
+	(=
+		(euclidean-norm '(3 -1 5))
+		5.91608))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; euclidean-distance
 
-
 (defun euclidean-distance (x y) 
-	"Calculates the euclidean (l2) distance between two vectors
- 
-		INPUT: x: vector, represented as a list
-					 y: vector, represented as a list
+		(euclidean-norm (mapcar #'- x y)))
 
-
-		OUTPUT: euclidean distance between x and y"
-		(euclidean-norm (mapcar #'- x y))
-	)
-
+(assert
+	(=
+		(euclidean-distance '(1 2 3) '(3 -1 5))
+		4.1231055))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-(defun cosine-similarity (x y) 
-	"Calculates the cosine similarity between two vectors
-
-
-		INPUT:  x: vector, representad as a list
-						y: vector, representad as a list
-
-
-		OUTPUT: cosine similarity between x and y
-
-
-		NOTES: 
-			 * Evaluates to NIL (not defined)
-				 if at least one of the vectors has zero norm.
-			 * The two vectors are assumed to have the same length"
+(defun cosine-similarity (x y)
 		(let ((xn (euclidean-norm x)) (yn (euclidean-norm y)))
 			(if (or (= 0 xn) (= 0 yn)) nil
-				(/ (scalar-product x y) (* xn yn))))
-	)
+				(/ (scalar-product x y) (* xn yn)))))
 
+(assert (=
+	(cosine-similarity '(1 2 3) '(-2 1 3))
+	0.6428571))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun angular-distance (x y) 
-	"Calculates the angular distance between two vectors
 
-
-	 INPUT:  x: vector, representad as a list
-					 y: vector, representad as a list
-
-
-	 OUTPUT: cosine similarity between x and y
-
-
-	 NOTES: 
-			* Evaluates to NIL (not well defined)
-				if at least one of the vectors has zero norm.
-			* The two vectors are assumed to have the same length"
-
+(defun angular-distance (x y)
 		(let ((var (cosine-similarity x y)))
 			(if (null var) nil
-			(/ (acos var) pi)))
-	)
+			(/ (acos var) pi))))
+			
+(assert (= 
+	(angular-distance '(1 2 3) '(-2 1 3))
+	0.2777489))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; select-vectors
 
@@ -160,19 +121,12 @@
         ()
         (cons
             (cons (first lst-vectors) (funcall fun (first lst-vectors) vector))
-            (sim-map (rest lst-vectors) vector fun)
-		)
-	)
-)
-
+            (sim-map (rest lst-vectors) vector fun))))
 
 (defun select-vectors (lst-vectors test-vector similarity-fn &optional (threshold 0))
     (sort 
 		(remove-if #'(lambda(x) (< (rest x) threshold)) (sim-map lst-vectors test-vector similarity-fn)) 
-		#'(lambda(x y) (> (rest x) (rest y)))
-	)
-)
-
+		#'(lambda(x y) (> (rest x) (rest y)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -185,62 +139,14 @@
             (new-lowest-cmp (first map-lst-vector)))
             (if (< last-lowest new-lowest)
                 (lowest-aux (rest map-lst-vector) lowest)
-                (lowest-aux (rest map-lst-vector) new-lowest-cmp))
-        )
-    )
-)
+                (lowest-aux (rest map-lst-vector) new-lowest-cmp)))))
 
 (defun get-lowest (map-lst-vector)
     (lowest-aux map-lst-vector (cons '(0 0 0) 2.0)))
 
-
 (defun nearest-neighbor (lst-vectors test-vector distance-fn)
     (get-lowest (sim-map lst-vectors test-vector distance-fn)))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun backward-chaining-aux (goal lst-rules pending-goals)
-	(if (not (null (member goal pending-goals)))
-		NIL
-		(if (some #'(lambda(x) (and (equal (nth 1 x) goal) (null (first x)))) 
-				lst-rules
-			)
-			T
-			(let ((rules (remove-if #'(lambda(x) (not (equal (nth 1 x) goal))) lst-rules)))
-				(if (null rules)
-					NIL
-					(if (some
-							#'(lambda(rule) (equal T (every #'(lambda(x) 
-								(equal (backward-chaining-aux x (remove-if #'(lambda(x) (equal x rule)) lst-rules) (append pending-goals (list goal))) 'T)) 
-								(first rule)
-							)))
-							rules
-						)
-						T
-						NIL
-					)
-				)
-			)
-		)
-	)
-)
-
-
-(defun backward-chaining (goal lst-rules)
-	"Backward-chaining algorithm for propositional logic
- 
-	 INPUT: goal:      symbol that represents the goal
-					lst-rules: list of pairs of the form 
-										 (<antecedent>  <consequent>)
-										 where <antecedent> is a list of symbols
-										 and  <consequent> is a symbol
-
-
-	 OUTPUT: T (goal derived) or NIL (goal cannot be derived)
-
-
-	 NOTES: 
-				* Implemented with some, every" 
-
-
-	(backward-chaining-aux goal lst-rules NIL))
+(assert (equal 
+	(nearest-neighbor '((-1 -1 -1) (-2 2 2) (-1 -1 1)) '(1 1 1) #'angular-distance)
+	(cons '(-2 2 2) 0.39182654)))
