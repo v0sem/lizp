@@ -537,3 +537,28 @@
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 
+;;;    BEGIN Exercise 11: More strategies
+;;;
+
+(defparameter *depth-first*
+	(make-strategy
+		:name 'depth-first
+		:node-compare-p #'(lambda (x y) (> (node-depth x) (node-depth y)))
+	)
+)
+
+(defparameter *breadth-first*
+	(make-strategy
+		:name 'breadth-first
+		:node-compare-p #'(lambda (x y) (< (node-depth x) (node-depth y)))
+	)
+)
+
+;;; 
+;;;    END Exercise 11: More strategies
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
