@@ -112,7 +112,7 @@
 	(Nancy 50.0) (Orleans 55.0) (St-Malo 65.0)
 	(Nantes 75.0) (Brest 90.0) (Nevers 70.0) 
 	(Limoges 100.0) (Roenne 85.0) (Lyon 105.0)
-	(Toulouse 130.0) (Avignon 135.0) (Marseille 145.0)))
+          (Toulouse 130.0) (Avignon 135.0) (Marseille 145.0)))
 
 (defparameter *origin* 'Marseille)
 
@@ -191,8 +191,17 @@
 ;;    NIL: invalid path: either the final city is not a destination or some
 ;;         of the mandatory cities are missing from the path.
 ;;
-(defun f-goal-test (node destination mandatory) 
-	)
+(defun f-goal-test (node destination mandatory)
+  (if (not (null (member (node-city node) destination)))
+      (f-goal-test-aux node mandatory)
+      NIL))
+
+(defun f-goal-test-aux (node mandatory)
+  (if (equal (node-parent node) NIL)
+      (if (null mandatory)
+          T
+          NIL)
+      (f-goal-test-aux (node-parent node) (remove-if #'(lambda (x) (equal (node-city node) x)) mandatory))))
 
 ;;
 ;; END: Exercise 3 -- Goal test
