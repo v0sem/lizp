@@ -167,8 +167,8 @@
 ;;    the destination in the cities to which the current one is connected
 ;;
 (defun navigate (city lst-edges)
-	(print (mapcar #'(lambda (x) (make-action :name "Name" :origin (nth 0 x) :final (nth 1 x) :cost (nth 2 x)))
-		(remove-if-not #'(lambda (x) (eq (car x) city)) lst-edges)))
+	(mapcar #'(lambda (x) (make-action :name "Name" :origin (nth 0 x) :final (nth 1 x) :cost (nth 2 x)))
+		(remove-if-not #'(lambda (x) (eq (car x) city)) lst-edges))
 	)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -258,7 +258,7 @@
 		:f-h #'f-h
 		:f-goal-test #'f-goal-test
 		:f-search-state-equal #'f-search-state-equal
-		:succ #'navigate)))
+		:succ #'navigate))
 
 
 ;;
@@ -298,9 +298,16 @@
 ;;    given one
 ;;
 (defun expand-node (node problem)
-	)
-
-
+	(mapcar 
+		#'(lambda (act) (make-node 
+			:city (action-final act)
+			:parent node
+			:action act
+			:depth (+ 1 (node-depth node))
+			:g (+ (action-cost act) (node-g node))
+			:h (f-h (action-final act) *heuristic*)
+			:f (+ (action-cost act) (f-h (action-final act) *heuristic*))))
+		(navigate (node-city node) *trains*)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
