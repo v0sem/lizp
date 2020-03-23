@@ -168,8 +168,7 @@
 ;;
 (defun navigate (city lst-edges)
 	(mapcar #'(lambda (x) (make-action :name 'UselessName :origin (nth 0 x) :final (nth 1 x) :cost (nth 2 x)))
-		(remove-if-not #'(lambda (x) (eq (car x) city)) lst-edges))
-	)
+		(remove-if-not #'(lambda (x) (eq (car x) city)) lst-edges)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -368,8 +367,7 @@
 ;;   criterion node-compare-p.
 ;; 
 (defun insert-nodes (nodes lst-nodes node-compare-p)
-	(sort (append nodes lst-nodes) node-compare-p)
-)
+	(sort (append nodes lst-nodes) node-compare-p))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -396,8 +394,7 @@
 ;;   use it to call insert-nodes.
 ;;
 (defun insert-nodes-strategy (nodes lst-nodes strategy)
-	(insert-nodes nodes lst-nodes (strategy-node-compare-p strategy))
-	)
+	(insert-nodes nodes lst-nodes (strategy-node-compare-p strategy)))
 
 
 ;;
