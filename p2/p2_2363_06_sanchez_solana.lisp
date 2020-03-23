@@ -167,7 +167,7 @@
 ;;    the destination in the cities to which the current one is connected
 ;;
 (defun navigate (city lst-edges)
-	(mapcar #'(lambda (x) (make-action :name "Name" :origin (nth 0 x) :final (nth 1 x) :cost (nth 2 x)))
+	(mapcar #'(lambda (x) (make-action :name 'UselessName :origin (nth 0 x) :final (nth 1 x) :cost (nth 2 x)))
 		(remove-if-not #'(lambda (x) (eq (car x) city)) lst-edges))
 	)
 
@@ -227,7 +227,7 @@
 		(and
 			(eq c1 c2)) ; Check both cities are the same
 			(if (mandatory) ; If there is a mandatory list
-				(and (f-goal-test node-1 c1 mandatory) (f-goal-test mandatory)) ; Check both nodes
+				(and (f-goal-test node-1 c1 mandatory) (f-goal-test node-2 c2 mandatory)) ; Check both nodes
 				T))) ; No mandatory list means we are good
 
 ;;
@@ -359,9 +359,8 @@
 ;;   criterion node-compare-p.
 ;; 
 (defun insert-nodes (nodes lst-nodes node-compare-p)
-	(sort (append nodes lst-nodes) #'node-compare-p)
+	(sort (append nodes lst-nodes) node-compare-p)
 )
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -408,8 +407,11 @@
 ;; node to be analyzed is the one with the smallest value of g+h
 ;;
 (defparameter *A-star*
-	NIL
+	(make-strategy
+		:name 'A-star
+		:node-compare-p #'(lambda (x y) (< (node-f x) (node-f y))))
 	)
+
 ;;
 ;; END: Exercise 8 -- Definition of the A* strategy
 ;;
