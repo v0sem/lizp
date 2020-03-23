@@ -112,7 +112,7 @@
 	(Nancy 50.0) (Orleans 55.0) (St-Malo 65.0)
 	(Nantes 75.0) (Brest 90.0) (Nevers 70.0) 
 	(Limoges 100.0) (Roenne 85.0) (Lyon 105.0)
-          (Toulouse 130.0) (Avignon 135.0) (Marseille 145.0)))
+	(Toulouse 130.0) (Avignon 135.0) (Marseille 145.0)))
 
 (defparameter *origin* 'Marseille)
 
@@ -478,35 +478,65 @@
 ;;    and an empty closed list.
 ;;
 (defun exp-cond (node closed)
-	(if (NULL closed)
-		T ; Does not exist in closed so return True
-		(if (eq node (first closed)) ; Iterate through closed
-			(< (node-g node) (node-g (first closed))) ; If we found the node in closed
-			(exp-cond (node (rest closed)))) ; Keep looking
+	(let ((found-node (find node closed :test #'(lambda (x y) (eq (node-city x) (node-city y))))))
+		(if (NULL found-node)
+			T
+			(< (node-g node) (node-g found-node))
+		)
 	)
 )
 
 (defun graph-search-aux (problem strategy open closed goal-test)
-	(cond 
-		((NULL open) NIL) ; No solution
-		((funcall goal-test (first open)) (first open)) ; Check if current node is the solution (first)
-		((exp-cond (first open) closed) ( ; Check if we should expand by calling exp-cond
-			(let (
-				(nu-open (insert-node-strategy (expand-node (first open) problem) (rest open) strategy)) ; New open without the first and with the expanded nodes
-				(nu-closed (cons (first open) closed)) ; New closed with the current node added to it
+	(print '==========================================================)
+	(print "DO WE EXPAND > ")
+	(prin1 (exp-cond (first open) closed))
+	(print "OPEN LIST    > ")
+	(prin1 (mapcar #'(lambda (x) (list (node-city x) (node-g x))) open))
+	(print "CLOSED LIST  > ")
+	(prin1 (mapcar #'(lambda (x) (list (node-city x) (node-g x))) closed))
+	(read-line)
+	(if (or (NULL open) (NULL (first open)))
+		NIL
+		(if (funcall goal-test (first open) *destination* *mandatory*)
+			(first open) ; Are we there yet?
+			(if (exp-cond (first open) closed)
+				(graph-search-aux
+					problem
+					strategy
+					(insert-nodes-strategy (expand-node (first open) problem) (rest open) strategy)
+					(cons (first open) closed)
+					goal-test)
+				(graph-search-aux problem strategy (rest open) closed goal-test)
 			)
-				(graph-search-aux problem strategy nu-open nu-closed goal-test) ; Iterate with new lists
-			)
-		))
+		)
 	)
 )
+
+;(defun graph-search-aux (problem strategy open closed goal-test)
+;	(cond 
+;		((NULL open) NIL) ; No solution
+;		((funcall #'goal-test (first open)) (first open)) ; Check if current node is the solution (first)
+;		((exp-cond (first open) closed) ( ; Check if we should expand by calling exp-cond
+;			(graph-search-aux
+;				problem
+;				strategy
+;				(insert-node-strategy (expand-node (first open) problem) (rest open) strategy)
+;				(cons (first open) closed)
+;				goal-test) ; Iterate with new lists
+;		))
+;	)
+;)
 
 (defun graph-search (problem strategy)
-	(let ((open-nodes (make-node :city problem :parent NIL :action NIL)) (closed-nodes NIL))
-		(graph-search-aux problem strategy open-nodes closed-nodes #'f-goal-test)
-	)
+	(graph-search-aux
+		problem
+		strategy
+		(list (make-node :city (problem-initial-city problem) :parent NIL :action NIL))
+		NIL
+		#'f-goal-test)
 )
 
+(print (graph-search *travel* *A-star*))
 
 ;;
 ;; END: Exercise 9 -- Search algorithm
@@ -521,9 +551,9 @@
 ;*** solution-path ***
 
 (defun solution-path (node)
-  (if (null (node-parent node))
-      (list (node-city node))
-      (append (solution-path (node-parent node)) (list (node-city node)))))
+	(if (null (node-parent node))
+		(list (node-city node))
+		(append (solution-path (node-parent node)) (list (node-city node))))))
 
 
 ;;; 
