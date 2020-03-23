@@ -521,7 +521,9 @@
 ;*** solution-path ***
 
 (defun solution-path (node)
-)
+  (if (null (node-parent node))
+      (list (node-city node))
+      (append (solution-path (node-parent node)) (list (node-city node)))))
 
 
 ;;; 
