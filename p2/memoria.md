@@ -130,6 +130,80 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 (defparameter *A-star*
 	(make-strategy
 		:name 'A-star
-		:node-compare-p #'(lambda (x y) (< (node-f x) (node-f y))))
-	)
+		:node-compare-p #'(lambda (x y) (< (node-f x) (node-f y)))))
+```
+
+## Ejercicio 9
+
+```lisp
+(defun exp-cond (node closed)
+	(let ((found-node (find node closed :test #'f-search-state-equal)))
+		(if (NULL found-node)
+			T
+			(< (node-g node) (node-g found-node)))))
+
+(defun graph-search-aux (problem strategy open closed goal-test)
+	(if (or (NULL open) (NULL (first open)))
+		NIL
+		(if (funcall goal-test (first open) *destination* *mandatory*)
+			(first open) ; Are we there yet?
+			(if (exp-cond (first open) closed)
+				(graph-search-aux
+					problem
+					strategy
+					(insert-nodes-strategy (expand-node (first open) problem) (rest open) strategy)
+					(cons (first open) closed)
+					goal-test)
+				(graph-search-aux problem strategy (rest open) closed goal-test)))))
+
+(defun graph-search (problem strategy)
+	(graph-search-aux
+		problem
+		strategy
+		(list (make-node :city (problem-initial-city problem) :parent NIL :action NIL))
+		NIL
+		#'f-goal-test))
+```
+
+## Ejercicio 10
+
+```lisp
+(defun solution-path (node)
+	(if (null (node-parent node))
+		(list (node-city node))
+		(append (solution-path (node-parent node)) (list (node-city node)))))
+```
+
+## Ejercicio 11
+
+```lisp
+(defparameter *depth-first*
+	(make-strategy
+		:name 'depth-first
+		:node-compare-p #'(lambda (x y) (> (node-depth x) (node-depth y)))))
+
+(defparameter *breadth-first*
+	(make-strategy
+		:name 'breadth-first
+		:node-compare-p #'(lambda (x y) (< (node-depth x) (node-depth y)))))
+```
+
+## Ejercicio 12
+
+
+```lisp
+(defparameter *heuristic-new* 
+	'((Calais 5.0) (Reims 5.0) (Paris 4.0) 
+	(Nancy 5.0) (Orleans 3.0) (St-Malo 3.0)
+	(Nantes 2.0) (Brest 3.0) (Nevers 3.0) 
+	(Limoges 2.0) (Roenne 0.0) (Lyon 2.0)
+	(Toulouse 1.0) (Avignon 1.0) (Marseille 0.0)))
+
+; Heuristic defined in exercise 12
+(defparameter *heuristic-cero* 
+	'((Calais 0.0) (Reims 0.0) (Paris 0.0) 
+	(Nancy 0.0) (Orleans 0.0) (St-Malo 0.0)
+	(Nantes 0.0) (Brest 0.0) (Nevers 0.0) 
+	(Limoges 0.0) (Roenne 0.0) (Lyon 0.0)
+	(Toulouse 0.0) (Avignon 0.0) (Marseille 0.0)))
 ```
