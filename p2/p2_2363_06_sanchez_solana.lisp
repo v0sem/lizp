@@ -468,7 +468,34 @@
 ;;    function: creates an open list with a single node (the source)
 ;;    and an empty closed list.
 ;;
+(defun exp-cond (node closed)
+	(if (NULL closed)
+		T ; Does not exist in closed so return True
+		(if (eq node (first closed)) ; Iterate through closed
+			(< (node-g node) (node-g (first closed))) ; If we found the node in closed
+			(exp-cond (node (rest closed)))) ; Keep looking
+	)
+)
+
+(defun graph-search-aux (problem strategy open closed goal-test)
+	(cond 
+		((NULL open) NIL) ; No solution
+		((funcall goal-test (first open)) (first open)) ; Check if current node is the solution (first)
+		((exp-cond (first open) closed) ( ; Check if we should expand by calling exp-cond
+			(let (
+				(nu-open (insert-node-strategy (expand-node (first open) problem) (rest open) strategy)) ; New open without the first and with the expanded nodes
+				(nu-closed (cons (first open) closed)) ; New closed with the current node added to it
+			)
+				(graph-search-aux problem strategy nu-open nu-closed goal-test) ; Iterate with new lists
+			)
+		))
+	)
+)
+
 (defun graph-search (problem strategy)
+	(let ((open-nodes (make-node :city problem :parent NIL :action NIL)) (closed-nodes NIL))
+		(graph-search-aux problem strategy open-nodes closed-nodes #'f-goal-test)
+	)
 )
 
 
