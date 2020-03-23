@@ -368,7 +368,8 @@
 ;;   criterion node-compare-p.
 ;; 
 (defun insert-nodes (nodes lst-nodes node-compare-p)
-	(sort (append nodes lst-nodes) node-compare-p))
+	(sort (append nodes lst-nodes) node-compare-p)
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -395,7 +396,8 @@
 ;;   use it to call insert-nodes.
 ;;
 (defun insert-nodes-strategy (nodes lst-nodes strategy)
-	(insert-nodes nodes lst-nodes (strategy-node-compare-p strategy)))
+	(insert-nodes nodes lst-nodes (strategy-node-compare-p strategy))
+	)
 
 
 ;;
@@ -416,7 +418,9 @@
 (defparameter *A-star*
 	(make-strategy
 		:name 'A-star
-		:node-compare-p #'(lambda (x y) (< (node-f x) (node-f y)))))
+		:node-compare-p #'(lambda (x y) (< (node-f x) (node-f y)))
+	)
+)
 
 ;;
 ;; END: Exercise 8 -- Definition of the A* strategy
@@ -478,7 +482,10 @@
 	(let ((found-node (find node closed :test #'f-search-state-equal)))
 		(if (NULL found-node)
 			T
-			(< (node-g node) (node-g found-node)))))
+			(< (node-g node) (node-g found-node))
+		)
+	)
+)
 
 (defun graph-search-aux (problem strategy open closed goal-test)
 	(if (or (NULL open) (NULL (first open)))
@@ -492,7 +499,11 @@
 					(insert-nodes-strategy (expand-node (first open) problem) (rest open) strategy)
 					(cons (first open) closed)
 					goal-test)
-				(graph-search-aux problem strategy (rest open) closed goal-test)))))
+				(graph-search-aux problem strategy (rest open) closed goal-test)
+			)
+		)
+	)
+)
 
 (defun graph-search (problem strategy)
 	(graph-search-aux
@@ -500,7 +511,8 @@
 		strategy
 		(list (make-node :city (problem-initial-city problem) :parent NIL :action NIL))
 		NIL
-		#'f-goal-test))
+		#'f-goal-test)
+)
 
 ;;
 ;; END: Exercise 9 -- Search algorithm
@@ -535,12 +547,16 @@
 (defparameter *depth-first*
 	(make-strategy
 		:name 'depth-first
-		:node-compare-p #'(lambda (x y) (> (node-depth x) (node-depth y)))))
+		:node-compare-p #'(lambda (x y) (> (node-depth x) (node-depth y)))
+	)
+)
 
 (defparameter *breadth-first*
 	(make-strategy
 		:name 'breadth-first
-		:node-compare-p #'(lambda (x y) (< (node-depth x) (node-depth y)))))
+		:node-compare-p #'(lambda (x y) (< (node-depth x) (node-depth y)))
+	)
+)
 
 ;;; 
 ;;;    END Exercise 11: More strategies
@@ -569,6 +585,10 @@
 	(Nantes 0.0) (Brest 0.0) (Nevers 0.0) 
 	(Limoges 0.0) (Roenne 0.0) (Lyon 0.0)
 	(Toulouse 0.0) (Avignon 0.0) (Marseille 0.0)))
+
+(print (time (graph-search *travel* *A-star*))) ; heuristic  | 0.0 sec
+(print (time (graph-search *travel* *A-star*))) ; heuristic-new  | 9.974E-4 sec
+(print (time (graph-search *travel* *A-star*))) ; heuristic-cero | 9.973E-4 sec
 
 ;;; 
 ;;;    END Exercise 12: More euristics
