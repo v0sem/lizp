@@ -166,7 +166,9 @@
 ;;    A list of action structures with the origin in the current city and
 ;;    the destination in the cities to which the current one is connected
 ;;
-(defun navigate (city lst-edges )
+(defun navigate (city lst-edges)
+	(print (mapcar #'(lambda (x) (make-action :name "Name" :origin (nth 0 x) :final (nth 1 x) :cost (nth 2 x)))
+		(remove-if-not #'(lambda (x) (eq (car x) city)) lst-edges)))
 	)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
