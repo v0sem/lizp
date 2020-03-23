@@ -166,7 +166,9 @@
 ;;    A list of action structures with the origin in the current city and
 ;;    the destination in the cities to which the current one is connected
 ;;
-(defun navigate (city lst-edges )
+(defun navigate (city lst-edges)
+	(mapcar #'(lambda (x) (make-action :name 'UselessName :origin (nth 0 x) :final (nth 1 x) :cost (nth 2 x)))
+		(remove-if-not #'(lambda (x) (eq (car x) city)) lst-edges))
 	)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -230,7 +232,12 @@
 ;;    NIL: The nodes are not equivalent
 ;;
 (defun f-search-state-equal (node-1 node-2 &optional mandatory)
-	)
+	(let ((c1 (node-city node-1)) (c2 (node-city node-1)))
+		(and
+			(eq c1 c2)) ; Check both cities are the same
+			(if (mandatory) ; If there is a mandatory list
+				(and (f-goal-test node-1 c1 mandatory) (f-goal-test node-2 c2 mandatory)) ; Check both nodes
+				T))) ; No mandatory list means we are good
 
 ;;
 ;; END: Exercise  -- Equal predicate for search states
@@ -254,7 +261,13 @@
 ;;
 
 (defparameter *travel* 
-	NIL)
+	(make-problem
+		:cities *cities*
+		:initial-city *origin*
+		:f-h #'f-h
+		:f-goal-test #'f-goal-test
+		:f-search-state-equal #'f-search-state-equal
+		:succ #'navigate))
 
 
 ;;
@@ -294,9 +307,16 @@
 ;;    given one
 ;;
 (defun expand-node (node problem)
-	)
-
-
+	(mapcar 
+		#'(lambda (act) (make-node 
+			:city (action-final act)
+			:parent node
+			:action act
+			:depth (+ 1 (node-depth node))
+			:g (+ (action-cost act) (node-g node))
+			:h (f-h (action-final act) *heuristic*)
+			:f (+ (action-cost act) (f-h (action-final act) *heuristic*))))
+		(navigate (node-city node) *trains*)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -348,8 +368,8 @@
 ;;   criterion node-compare-p.
 ;; 
 (defun insert-nodes (nodes lst-nodes node-compare-p)
+	(sort (append nodes lst-nodes) node-compare-p)
 )
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -376,6 +396,7 @@
 ;;   use it to call insert-nodes.
 ;;
 (defun insert-nodes-strategy (nodes lst-nodes strategy)
+	(insert-nodes nodes lst-nodes (strategy-node-compare-p strategy))
 	)
 
 
@@ -395,8 +416,11 @@
 ;; node to be analyzed is the one with the smallest value of g+h
 ;;
 (defparameter *A-star*
-	NIL
+	(make-strategy
+		:name 'A-star
+		:node-compare-p #'(lambda (x y) (< (node-f x) (node-f y))))
 	)
+
 ;;
 ;; END: Exercise 8 -- Definition of the A* strategy
 ;;
@@ -453,7 +477,34 @@
 ;;    function: creates an open list with a single node (the source)
 ;;    and an empty closed list.
 ;;
+(defun exp-cond (node closed)
+	(if (NULL closed)
+		T ; Does not exist in closed so return True
+		(if (eq node (first closed)) ; Iterate through closed
+			(< (node-g node) (node-g (first closed))) ; If we found the node in closed
+			(exp-cond (node (rest closed)))) ; Keep looking
+	)
+)
+
+(defun graph-search-aux (problem strategy open closed goal-test)
+	(cond 
+		((NULL open) NIL) ; No solution
+		((funcall goal-test (first open)) (first open)) ; Check if current node is the solution (first)
+		((exp-cond (first open) closed) ( ; Check if we should expand by calling exp-cond
+			(let (
+				(nu-open (insert-node-strategy (expand-node (first open) problem) (rest open) strategy)) ; New open without the first and with the expanded nodes
+				(nu-closed (cons (first open) closed)) ; New closed with the current node added to it
+			)
+				(graph-search-aux problem strategy nu-open nu-closed goal-test) ; Iterate with new lists
+			)
+		))
+	)
+)
+
 (defun graph-search (problem strategy)
+	(let ((open-nodes (make-node :city problem :parent NIL :action NIL)) (closed-nodes NIL))
+		(graph-search-aux problem strategy open-nodes closed-nodes #'f-goal-test)
+	)
 )
 
 
