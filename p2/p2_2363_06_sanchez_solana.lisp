@@ -223,7 +223,12 @@
 ;;    NIL: The nodes are not equivalent
 ;;
 (defun f-search-state-equal (node-1 node-2 &optional mandatory)
-	)
+	(let ((c1 (node-city node-1)) (c2 (node-city node-1)))
+		(and
+			(eq c1 c2)) ; Check both cities are the same
+			(if (mandatory) ; If there is a mandatory list
+				(and (f-goal-test node-1 c1 mandatory) (f-goal-test mandatory)) ; Check both nodes
+				T))) ; No mandatory list means we are good
 
 ;;
 ;; END: Exercise  -- Equal predicate for search states
