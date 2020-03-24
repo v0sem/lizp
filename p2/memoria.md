@@ -230,7 +230,8 @@ Heuristicas nueva y cero.
 # Cuestiones
 
 1. 
-    a.
+    a. Es fácil actualizar la heurística y el sistema de nodos es sencillo y no ocupa mucha memoria. A parte puedes cambiar la estrategia de camino y estudiar otras posibilidades fácilmente.
+    
     b. Para luego poder fácilmente cambiar esos datos y que no haya que cambiar todo el código entero a la hora de probar nuevos caminos.
 
 2. Dado que son referencias al nodo padre y no guarda el nodo padre en sí
