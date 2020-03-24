@@ -75,6 +75,8 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 
 ## Ejercicio 4
 
+Primero comprobamos que las ciudades de los nodos son iguales y luego, usando f-goal-test, comprobamos que visitan todas las ciudades *mandatory*.
+
 ```lisp
 (defun f-search-state-equal (node-1 node-2 &optional mandatory)
 	(let ((c1 (node-city node-1)) (c2 (node-city node-1)))
@@ -86,6 +88,8 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 ```
 
 ## Ejercicio 5
+
+Definimos el parámetro travel con las funciones definidas anteriormente.
 
 ```lisp
 (defparameter *travel* 
@@ -99,6 +103,8 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 ```
 
 ## Ejercicio 6
+
+Con un mapcar, creamos cada uno de los nodos usando la función de navigate.
 
 ```lisp
 (defun expand-node (node problem)
@@ -116,6 +122,8 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 
 ## Ejercicio 7
 
+Usando sort, con la estrategia que se pasa por argumento, ordenamos la lista generada por ambas listas.
+
 ```lisp
 (defun insert-nodes (nodes lst-nodes node-compare-p)
 	(sort (append nodes lst-nodes) node-compare-p))
@@ -126,6 +134,10 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 
 ## Ejercicio 8
 
+Conociendo el algoritmo A* creamos el node-compare-p.
+
+Elige el camino según sea el menor actualmente, por lo tanto:
+
 ```lisp
 (defparameter *A-star*
 	(make-strategy
@@ -134,6 +146,8 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 ```
 
 ## Ejercicio 9
+
+Este algoritmo junta todo lo realizado anteriormente para encontrar un camino. Depende del destino y las ciudades obligatorias marcadas como parámetros.
 
 ```lisp
 (defun exp-cond (node closed)
@@ -167,6 +181,8 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 
 ## Ejercicio 10
 
+Imprime el camino recorrido subiendo por los nodos padre.
+
 ```lisp
 (defun solution-path (node)
 	(if (null (node-parent node))
@@ -175,6 +191,8 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 ```
 
 ## Ejercicio 11
+
+Estrategias de profundidad y anchura.
 
 ```lisp
 (defparameter *depth-first*
@@ -190,6 +208,7 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 
 ## Ejercicio 12
 
+Heuristicas nueva y cero.
 
 ```lisp
 (defparameter *heuristic-new* 
@@ -207,3 +226,15 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 	(Limoges 0.0) (Roenne 0.0) (Lyon 0.0)
 	(Toulouse 0.0) (Avignon 0.0) (Marseille 0.0)))
 ```
+
+# Cuestiones
+
+1. 
+    a.
+    b. Para luego poder fácilmente cambiar esos datos y que no haya que cambiar todo el código entero a la hora de probar nuevos caminos.
+
+2. Dado que son referencias al nodo padre y no guarda el nodo padre en sí
+
+3. Un nodo por cada ciudad y una accion por cada camino entre ciudades. Y cada búsqueda tiene un único problema.
+
+4. O(log *h*\*(x)) Donde *h*\* es la heurística perfecta desde x a la meta.
