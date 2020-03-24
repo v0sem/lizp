@@ -562,35 +562,3 @@
 ;;;    END Exercise 11: More strategies
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; 
-;;;    BEGIN Exercise 12: More euristics
-;;;
-
-; Heuristic using relative values depending on the minimum number of jumps needed to get there from marseille
-(defparameter *heuristic-new* 
-	'((Calais 5.0) (Reims 5.0) (Paris 4.0) 
-	(Nancy 5.0) (Orleans 3.0) (St-Malo 3.0)
-	(Nantes 2.0) (Brest 3.0) (Nevers 3.0) 
-	(Limoges 2.0) (Roenne 0.0) (Lyon 2.0)
-	(Toulouse 1.0) (Avignon 1.0) (Marseille 0.0)))
-
-; Heuristic defined in exercise 12
-(defparameter *heuristic-cero* 
-	'((Calais 0.0) (Reims 0.0) (Paris 0.0) 
-	(Nancy 0.0) (Orleans 0.0) (St-Malo 0.0)
-	(Nantes 0.0) (Brest 0.0) (Nevers 0.0) 
-	(Limoges 0.0) (Roenne 0.0) (Lyon 0.0)
-	(Toulouse 0.0) (Avignon 0.0) (Marseille 0.0)))
-
-(print (time (graph-search *travel* *A-star*))) ; heuristic  | 0.0 sec
-(print (time (graph-search *travel* *A-star*))) ; heuristic-new  | 9.974E-4 sec
-(print (time (graph-search *travel* *A-star*))) ; heuristic-cero | 9.973E-4 sec
-
-;;; 
-;;;    END Exercise 12: More euristics
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
