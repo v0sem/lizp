@@ -9,13 +9,14 @@ date:
 - 27/02/2020
 papersize:
 - a4
+lang:
+- es-SP
 fontsize:
 - 12pt
 geometry:
 - margin=1in
 header-includes:
 - \setlength\parindent{0pt}
-- \usepackage[spanish]{babel}
 ---
 
 \maketitle
@@ -48,8 +49,13 @@ Primero elimina todos los elementos que no tengan la ciudad y luego crea todas l
 
 ```lisp
 (defun navigate (city lst-edges)
-	(mapcar #'(lambda (x) (make-action :name 'UselessName :origin (nth 0 x) :final (nth 1 x) :cost (nth 2 x)))
-		(remove-if-not #'(lambda (x) (eq (car x) city)) lst-edges)))
+	(mapcar #'(lambda (x) 
+    (make-action 
+      :name 'UselessName 
+      :origin (nth 0 x) 
+      :final (nth 1 x) 
+      :cost (nth 2 x)))
+		    (remove-if-not #'(lambda (x) (eq (car x) city)) lst-edges)))
 ```
 
 ## Ejercicio 3
@@ -66,10 +72,12 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 
 (defun f-goal-test-aux (node mandatory)
   (if (equal (node-parent node) NIL)
-      (if (null (remove-if #'(lambda (x) (equal (node-city node) x)) mandatory))
+      (if (null (remove-if 
+        #'(lambda (x) (equal (node-city node) x)) mandatory))
           T
           NIL)
-      (f-goal-test-aux (node-parent node) (remove-if #'(lambda (x) (equal (node-city node) x)) mandatory))))
+      (f-goal-test-aux (node-parent node) (remove-if 
+        #'(lambda (x) (equal (node-city node) x)) mandatory))))
 ```
 
 ## Ejercicio 4
@@ -79,9 +87,12 @@ Primero comprobamos que las ciudades de los nodos son iguales y luego, usando f-
 ```lisp
 (defun f-search-state-equal (node-1 node-2 &optional mandatory)
   (and
-	(equal (node-city node-1) (node-city node-2)) ; Check both cities are the same
+	(equal (node-city node-1) (node-city node-2)) 
+  ; Check both cities are the same
 	  (if mandatory ; If there is a mandatory list
-		(and (f-goal-test node-1 (list (node-city node-1)) mandatory) (f-goal-test node-2 (list (node-city node-2)) mandatory)) ; Check both nodes
+		(and (f-goal-test node-1 (list (node-city node-1)) mandatory) 
+      (f-goal-test node-2 (list (node-city node-2)) mandatory)) 
+      ; Check both nodes
 		  T))) ; No mandatory list means we are good
 ```
 
@@ -163,16 +174,23 @@ Este algoritmo junta todo lo realizado anteriormente para encontrar un camino. D
 				(graph-search-aux
 					problem
 					strategy
-					(insert-nodes-strategy (expand-node (first open) problem) (rest open) strategy)
+					(insert-nodes-strategy 
+            (expand-node (first open) problem) (rest open) strategy)
 					(cons (first open) closed)
 					goal-test)
-				(graph-search-aux problem strategy (rest open) closed goal-test)))))
+				(graph-search-aux 
+          problem 
+          strategy 
+          (rest open) closed goal-test)))))
 
 (defun graph-search (problem strategy)
 	(graph-search-aux
 		problem
 		strategy
-		(list (make-node :city (problem-initial-city problem) :parent NIL :action NIL))
+		(list (make-node 
+    :city (problem-initial-city problem) 
+    :parent NIL 
+    :action NIL))
 		NIL
 		#'f-goal-test))
 ```
@@ -229,7 +247,7 @@ Heuristicas nueva y cero.
 
 1. 
     a. Es fácil actualizar la heurística y el sistema de nodos es sencillo y no ocupa mucha memoria. A parte puedes cambiar la estrategia de camino y estudiar otras posibilidades fácilmente.
-    
+
     b. Para luego poder fácilmente cambiar esos datos y que no haya que cambiar todo el código entero a la hora de probar nuevos caminos.
 
 2. Dado que son referencias al nodo padre y no guarda el nodo padre en sí
