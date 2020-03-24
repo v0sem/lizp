@@ -66,11 +66,10 @@ La condición de salida (no hay padre), comprueba después que mandatory está v
 
 (defun f-goal-test-aux (node mandatory)
   (if (equal (node-parent node) NIL)
-      (if (null mandatory)
+      (if (null (remove-if #'(lambda (x) (equal (node-city node) x)) mandatory))
           T
           NIL)
-      (f-goal-test-aux (node-parent node) (remove-if 
-      #'(lambda (x) (equal (node-city node) x)) mandatory))))
+      (f-goal-test-aux (node-parent node) (remove-if #'(lambda (x) (equal (node-city node) x)) mandatory))))
 ```
 
 ## Ejercicio 4
@@ -79,12 +78,11 @@ Primero comprobamos que las ciudades de los nodos son iguales y luego, usando f-
 
 ```lisp
 (defun f-search-state-equal (node-1 node-2 &optional mandatory)
-	(let ((c1 (node-city node-1)) (c2 (node-city node-1)))
-		(and
-			(eq c1 c2))
-			(if (mandatory)
-				(and (f-goal-test node-1 c1 mandatory) (f-goal-test node-2 c2 mandatory))
-				T)))
+  (and
+	(equal (node-city node-1) (node-city node-2)) ; Check both cities are the same
+	  (if mandatory ; If there is a mandatory list
+		(and (f-goal-test node-1 (list (node-city node-1)) mandatory) (f-goal-test node-2 (list (node-city node-2)) mandatory)) ; Check both nodes
+		  T))) ; No mandatory list means we are good
 ```
 
 ## Ejercicio 5
